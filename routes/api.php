@@ -16,8 +16,13 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::post('/auth/login', [AuthServiceController::class, 'login'])->middleware('throttle');
-Route::post('/auth/register', [AuthServiceController::class, 'register'])->middleware('throttle');
+
+Route::middleware('throttle')->group(function () {
+    Route::post('/auth/login', [AuthServiceController::class, 'login']);
+    Route::post('/auth/register', [AuthServiceController::class, 'register']);
+    Route::post('/auth/forgot-password', [AuthServiceController::class, 'forgotPassword']);
+    Route::post('/auth/forgot-password/verify', [AuthServiceController::class, 'verifyPasswordCode']);
+});
 
 
 Route::middleware('auth:sanctum')->group(function () {
