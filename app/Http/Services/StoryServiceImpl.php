@@ -27,7 +27,7 @@ class StoryServiceImpl implements StoryService
 
     public function getStories()
     {
-        return Story::with('user', 'category')->get();
+        return Story::with('user', 'category')->orderBy('id', 'DESC')->get();
     }
 
     public function getStoryById($id)
