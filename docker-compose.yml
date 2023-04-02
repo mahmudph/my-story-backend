@@ -16,7 +16,7 @@ services:
         volumes:
             - ./:/var/www/html/
         depends_on:
-            - db
+            - my_story_db
     my_story_webserver:
         image: nginx:alpine
         container_name: my_story_webserver
