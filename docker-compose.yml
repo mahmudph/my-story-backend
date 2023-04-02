@@ -32,7 +32,7 @@ services:
 
         labels:
             - "traefik.enable=true"
-            - "traefik.http.routers.my_story_app.rule=Host(`pelatihan.semanja.localhost`)"
+            - "traefik.http.routers.my_story_app.rule=Host(`${APP_HOST:-pelatihan.semanja.localhost}`)"
             - "traefik.http.routers.my_story_app.tls=true"
             - "traefik.http.routers.my_story_app.entrypoints=websecure"
             - "traefik.http.routers.my_story_app.tls.certresolver=myresolver"
