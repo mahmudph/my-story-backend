@@ -1,11 +1,10 @@
 version: "3"
 services:
-    app:
+    my_story_app:
         build:
             context: ./
             dockerfile: Dockerfile
-        image: cloudsigma.com/php
-        container_name: app
+        container_name: my_story_app
         restart: always
         tty: true
         environment:
@@ -18,14 +17,11 @@ services:
             - ./:/var/www/html/
         depends_on:
             - db
-    webserver:
+    my_story_webserver:
         image: nginx:alpine
-        container_name: webserver
+        container_name: my_story_webserver
         restart: always
         tty: true
-        # ports:
-        #     - "8080:80"
-        #     - "443:443"
         networks:
             - my-story-network
             - traefik
@@ -36,19 +32,17 @@ services:
 
         labels:
             - "traefik.enable=true"
-            - "traefik.http.routers.app.rule=Host(`pelatihan.semanja.xyz`)"
-            - "traefik.http.routers.app.tls=true"
-            - "traefik.http.routers.app.entrypoints=websecure"
-            - "traefik.http.routers.app.tls.certresolver=myresolver"
-            - "traefik.http.services.app.loadbalancer.server.port=80"
+            - "traefik.http.routers.my_story_app.rule=Host(`pelatihan.semanja.localhost`)"
+            - "traefik.http.routers.my_story_app.tls=true"
+            - "traefik.http.routers.my_story_app.entrypoints=websecure"
+            - "traefik.http.routers.my_story_app.tls.certresolver=myresolver"
+            - "traefik.http.services.my_story_app.loadbalancer.server.port=80"
             - "traefik.docker.network=traefik"
-    db:
-        image: mariadb:10.5
-        container_name: db
+    my_story_db:
+        image: mariadb:10
+        container_name: my_story_db
         restart: always
         tty: true
-        # ports:
-        #     - "3306:3306"
         environment:
             MARIADB_DATABASE: ${DB_DATABASE}
             MARIADB_ROOT_PASSWORD: ${DB_PASSWORD}

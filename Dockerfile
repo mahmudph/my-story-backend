@@ -1,45 +1,60 @@
-# FROM php:8.1.16-zts-alpine3.17
-FROM php:8.1.0-fpm
+FROM php:8.1.17-fpm-alpine3.17
 
-# copy into working directory
-COPY composer.lock composer.json /var/www/html/
+WORKDIR /var/www/html/
 
-# Install dependencies for the operating system software
-RUN apt-get update && apt-get install -y \
-    build-essential \
-    libpng-dev \
-    libjpeg62-turbo-dev \
-    libfreetype6-dev \
-    locales \
-    zip \
-    jpegoptim optipng pngquant gifsicle \
-    vim \
-    libzip-dev \
-    unzip \
-    git \
-    libonig-dev \
-    curl
+# Essentials
+RUN echo "UTC" > /etc/timezone
 
-# Clear cache
-RUN apt-get clean && rm -rf /var/lib/apt/lists/*
+# install necessary alpine packages
+RUN apk add zip unzip curl
 
-# Install extensions for php
-RUN docker-php-ext-install pdo_mysql mbstring zip exif pcntl
-RUN docker-php-ext-configure gd --with-freetype --with-jpeg
-RUN docker-php-ext-install gd
+# Installing bash
+RUN apk add bash
+RUN sed -i 's/bin\/ash/bin\/bash/g' /etc/passwd
 
-# Install composer (php package manager)
-RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
+# Installing PHP
+RUN apk add --no-cache php81 \
+    php81-common \
+    php81-gd \
+    php81-fpm \
+    php81-pdo \
+    php81-opcache \
+    php81-zip \
+    php81-phar \
+    php81-iconv \
+    php81-cli \
+    php81-curl \
+    php81-openssl \
+    php81-mbstring \
+    php81-tokenizer \
+    php81-fileinfo \
+    php81-json \
+    php81-xml \
+    php81-xmlwriter \
+    php81-simplexml \
+    php81-dom \
+    php81-pdo_mysql \
+    php81-tokenizer
 
-# Copy existing application directory contents to the working directory
-COPY . /var/www/html
+
+# install driver pdo mysql since it not being instaled
+# when install with apk add command
+RUN docker-php-ext-install pdo pdo_mysql
+
+# Installing composer
+RUN curl -sS https://getcomposer.org/installer -o composer-setup.php
+RUN php composer-setup.php --install-dir=/usr/local/bin --filename=composer --version=2.4.2
+RUN rm -rf composer-setup.php
 
 
-# Assign permissions of the working directory to the www-data user
+COPY . .
+# RUN composer install --no-dev
+RUN composer install
+
+
 RUN chown -R www-data:www-data \
         /var/www/html/storage \
         /var/www/html/bootstrap/cache
-
 
 EXPOSE 9000
 CMD ["php-fpm"]
